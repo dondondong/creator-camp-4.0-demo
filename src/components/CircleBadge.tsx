@@ -1,14 +1,14 @@
-// 虚线框
+// CircleBadge：带动画的圆形徽章（支持虚线/实线、hover、选中、高亮、完成状态）
 
 import { motion, type Variants } from "framer-motion";
 
 type CircleBadgeProps = {
   size: number;
-  isDone?: boolean;
-  isSelected?: boolean;
-  isHovered?: boolean;
+  isDone?: boolean;       // 是否已完成
+  isSelected?: boolean;   // 是否被选中
+  isHovered?: boolean;    // 是否处于 hover 状态
 
-  // 未完成（normal）
+  // --- 未完成(normal)样式 ---
   strokeColor?: string;
   selectedStrokeColor?: string;
   strokeWidth?: number;
@@ -18,7 +18,7 @@ type CircleBadgeProps = {
   hoverStrokeWidth?: number;
   selectedHoverStrokeWidth?: number;
 
-  // 已完成（done）
+  // --- 已完成(done)样式 ---
   doneStrokeColor?: string;
   selectedDoneStrokeColor?: string;
   doneStrokeWidth?: number;
@@ -28,8 +28,9 @@ type CircleBadgeProps = {
   doneHoverStrokeWidth?: number;
   selectedDoneHoverStrokeWidth?: number;
 
+  // 额外配置
   customVariants?: Variants;
-  checkSrc?: string;
+  checkSrc?: string;      // 对勾图标
 };
 
 export default function CircleBadge({
@@ -38,7 +39,7 @@ export default function CircleBadge({
   isSelected = false,
 
   // 未完成
-  strokeColor = "rgba(255,255,255,.25)", 
+  strokeColor = "rgba(255,255,255,.25)",
   selectedStrokeColor = 'rgba(255,255,255,.92)',
   strokeWidth = 2.5,
   selectedStrokeWidth = 3.5,
@@ -60,7 +61,7 @@ export default function CircleBadge({
   customVariants,
   checkSrc = "/tick_summary.png",
 }: CircleBadgeProps) {
-  // 半径用“最大描边”算，避免 hover 变粗被裁切
+  // 半径：用“最大描边宽度”计算，避免 hover 时变粗被裁切
   const maxSW = Math.max(
     strokeWidth,
     hoverStrokeWidth,
@@ -71,17 +72,18 @@ export default function CircleBadge({
   const cx = size / 2;
   const cy = size / 2;
 
+  // 圆圈动画状态（未完成 = 虚线，已完成 = 实线）
   const circleVariants: Variants = isDone
     ? {
       rest: {
         stroke: isSelected ? selectedDoneStrokeColor : doneStrokeColor,
         strokeWidth: isSelected ? selectedDoneStrokeWidth : doneStrokeWidth,
         fill: "none",
-        strokeDasharray: undefined
+        strokeDasharray: undefined,
       },
       hover: {
         stroke: isSelected ? selectedDoneHoverStrokeColor : doneHoverStrokeColor,
-        strokeWidth: isSelected ? selectedDoneHoverStrokeWidth : doneHoverStrokeWidth
+        strokeWidth: isSelected ? selectedDoneHoverStrokeWidth : doneHoverStrokeWidth,
       },
     }
     : {
@@ -89,17 +91,17 @@ export default function CircleBadge({
         stroke: isSelected ? selectedStrokeColor : strokeColor,
         strokeWidth: isSelected ? selectedStrokeWidth : strokeWidth,
         fill: "none",
-        strokeDasharray: "4 3.75"
+        strokeDasharray: "4 3.75", // 未完成时虚线样式
       },
       hover: {
         stroke: isSelected ? seletedHoverStrokeColor : hoverStrokeColor,
-        strokeWidth: isSelected ? selectedHoverStrokeWidth : hoverStrokeWidth
+        strokeWidth: isSelected ? selectedHoverStrokeWidth : hoverStrokeWidth,
       },
     };
 
   const variantsToUse = customVariants ?? circleVariants;
 
-  // 对勾图标摆放
+  // 对勾图标位置（中心对齐）
   const checkSize = size * 0.5;
   const checkX = cx - checkSize / 2;
   const checkY = cy - checkSize / 2;
@@ -111,7 +113,7 @@ export default function CircleBadge({
       style={{ display: "block" }}
       aria-hidden="true"
     >
-      {/* 单一圆圈：颜色/粗细/虚线都交给 variants */}
+      {/* 单一圆圈：颜色、粗细、虚线由 variants 控制 */}
       <motion.circle
         cx={cx}
         cy={cy}
@@ -125,7 +127,7 @@ export default function CircleBadge({
         }}
       />
 
-      {/* 已完成显示对勾 */}
+      {/* 已完成时显示对勾 */}
       {isDone && (
         <motion.image
           href={checkSrc}
